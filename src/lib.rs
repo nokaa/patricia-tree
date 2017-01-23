@@ -72,3 +72,79 @@ fn get_match_len(a: &str, b: &str) -> usize {
     }
     match_len
 }
+
+#[cfg(test)]
+mod test {
+    use super::Trie;
+    use super::node::TrieNode;
+
+    #[test]
+    fn single_insert() {
+        let data = "Data";
+        let mut trie = Trie::new();
+        trie.insert("data", data);
+
+        let trie2 = Trie {
+            children: vec![TrieNode {
+                               key: "data".to_string(),
+                               value: Some(data),
+                               children: Vec::new(),
+                           }],
+        };
+
+        assert_eq!(trie, trie2);
+        assert_eq!(trie.get("data"), Some(&data));
+    }
+
+    #[test]
+    fn multiple_insert() {
+        let mut trie = Trie::new();
+        trie.insert("/", "data");
+        trie.insert("/2", "data2");
+
+        let trie2 = Trie {
+            children: vec![TrieNode {
+                               key: "/".to_string(),
+                               value: Some("data"),
+                               children: vec![Box::new(TrieNode {
+                                                  key: "2".to_string(),
+                                                  value: Some("data2"),
+                                                  children: Vec::new(),
+                                              })],
+                           }],
+        };
+
+        assert_eq!(trie, trie2);
+        assert_eq!(trie.get("/"), Some(&"data"));
+        assert_eq!(trie.get("/2"), Some(&"data2"));
+    }
+
+    #[test]
+    fn split_node() {
+        let mut trie = Trie::new();
+        trie.insert("/1", "Data");
+        trie.insert("/2", "Data2");
+
+        let trie2 = Trie {
+            children: vec![TrieNode {
+                               key: "/".to_string(),
+                               value: None,
+                               children: vec![Box::new(TrieNode {
+                                                  key: "1".to_string(),
+                                                  value: Some("Data"),
+                                                  children: Vec::new(),
+                                              }),
+                                              Box::new(TrieNode {
+                                                  key: "2".to_string(),
+                                                  value: Some("Data2"),
+                                                  children: Vec::new(),
+                                              })],
+                           }],
+        };
+
+        assert_eq!(trie, trie2);
+        assert_eq!(trie.get("/"), None);
+        assert_eq!(trie.get("/1"), Some(&"Data"));
+        assert_eq!(trie.get("/2"), Some(&"Data2"));
+    }
+}

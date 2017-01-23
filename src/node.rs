@@ -3,11 +3,11 @@ use super::get_match_len;
 #[derive(Clone, Debug, PartialEq)]
 pub struct TrieNode<T> {
     /// The key associated with this node.
-    key: String,
+    pub key: String,
     /// The value associated with this node, if any.
-    value: Option<T>,
+    pub value: Option<T>,
     /// All branches from this node
-    children: Vec<Box<TrieNode<T>>>,
+    pub children: Vec<Box<TrieNode<T>>>,
 }
 
 impl<T> TrieNode<T> {
@@ -91,9 +91,23 @@ impl<T> TrieNode<T> {
                 // worry about another node with a matching prefix.
                 if self.children.is_empty() {
                     self.add_new_child(key, Some(value));
+                } else {
+                    self.insert_children(key, value);
                 }
             } else {
-                self.insert_children(key, value);
+                // Match length was less than the length of this node's key.
+                // Split this node into two seperate nodes.
+                let child_key = self.key[match_len..].to_string();
+                self.key = self.key[0..match_len].to_string();
+                let child_value = self.value.take();
+                self.add_new_child(child_key, child_value);
+
+                // Insert new node
+                let key = key[match_len..].to_string();
+                // This failing implies that we were given two of the same key
+                debug_assert!(!key.is_empty());
+
+                self.add_new_child(key, Some(value));
             }
         }
     }
