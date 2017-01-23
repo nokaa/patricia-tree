@@ -1,6 +1,6 @@
-# Patricia Tree
+# Patricia Trie
 
-A patricia tree implementation for rust.
+A patricia trie implementation for rust.
 
 ### Features
-Allows RegEx based values.
+Allows RegEx based keys.
