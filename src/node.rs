@@ -1,6 +1,8 @@
 use super::get_match_len;
 
-#[derive(Clone, Debug, PartialEq)]
+use std::cmp::Ordering;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TrieNode<T> {
     /// The key associated with this node.
     key: Vec<u8>,
@@ -8,6 +10,18 @@ pub struct TrieNode<T> {
     value: Option<T>,
     /// All branches from this node
     children: Vec<Box<TrieNode<T>>>,
+}
+
+impl<T> Ord for TrieNode<T> where T: Eq {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.key.cmp(&other.key)
+    }
+}
+
+impl<T> PartialOrd for TrieNode<T> where T: Eq {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl<T> TrieNode<T> {

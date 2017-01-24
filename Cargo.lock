@@ -1,4 +1,4 @@
 [root]
-name = "patricia-tree"
+name = "patricia-trie"
 version = "0.1.0"
 
